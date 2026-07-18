@@ -12,7 +12,7 @@ df_FPT['symbol'] = 'FPT'
 
 # 2. Tạo kết nối đến PostgreSQL (Docker) bằng SQLAlchemy
 # Công thức: postgresql://[user]:[password]@[host]:[port]/[database]
-engine = create_engine('postgresql://postgres:123456@localhost:5432/vnstock')
+engine = create_engine('postgresql://postgres:123456@localhost:5433/vnstock')
 
 # 3. Một dòng duy nhất để đẩy toàn bộ DataFrame vào bảng 'daily_prices'
 # if_exists='append': Nếu bảng chưa có thì tự động tạo, nếu có rồi thì chèn thêm vào cuối bảng
