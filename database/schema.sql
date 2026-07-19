@@ -27,13 +27,13 @@ CREATE TABLE IF NOT EXISTS daily_prices (
     -- Ngày giao dịch
     trading_date DATE NOT NULL,
 
-    open NUMERIC(12,2),
+    open_price NUMERIC(12,2),
 
     high NUMERIC(12,2),
 
     low NUMERIC(12,2),
 
-    close NUMERIC(12,2),
+    close_price NUMERIC(12,2),
 
     volume BIGINT,
 

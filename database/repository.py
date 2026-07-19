@@ -1,21 +1,41 @@
 
 
-import sys
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
 from database.connection import getConnection
 
 
-class PriceRepository:
+class Repository:
+    def insert_stock(self,symbol, company_name,exchange):
+        conn = getConnection()
+        cur = conn.cursor()
+        sql ="""
+            INSERT INTO stocks(symbol, company_name, exchange)
+            VALUES (%s,%s,%s)
+            """
+        cur.execute(sql,(symbol,company_name,exchange))
+        conn.commit()
+        cur.close()
+        conn.close()
 
-    def __init__(self):
+    def insert_price(self,stock_id, trading_date, open_price, high, low, close_price,volume):
+        conn = getConnection()
+        cur  = conn.cursor()
+        sql = """ INSERT INTO daily_prices(stock_id,trading_date,open_price,high,low,close_price,volume) 
+                VALUES (%s,%s,%s,%s,%s,%s,%s)
+              """
+        cur.execute(sql,(stock_id, trading_date, open_price, high, low, close_price,volume))
+        conn.commit()
+        cur.close()
+        conn.close()
 
-        # Tạo kết nối PostgreSQL
-        self.conn = getConnection()
-
-        # Cursor dùng để thực thi SQL
-        self.cursor = self.conn.cursor()
+    def get_stockID(self,symbol):
+        conn = getConnection()
+        cur = conn.cursor()
+        sql=""" SELECT id FROM stocks WHERE symbol = %s """
+        cur.execute(sql,(symbol,))
+        row = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+        return row[0]
+        
+        
