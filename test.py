@@ -1,22 +1,9 @@
-import sys
-from pathlib import Path
+from database.repository import Repository
+import pandas as pd
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
-from database.connection import getConnection
-
-try:
-    con = getConnection()
-
-    print("✅ Connected to PostgreSQL successfully!")
-
-    con.close()
-
-    print("🔒 Connection closed.")
-
-    
-except Exception as e:
-    print("❌ Connection failed!")
-    print(e)
+repo = Repository()
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
+pd.set_option("display.width", None)
+df_VIC = repo.get_ohlcv("VIC")
+print(df_VIC.to_string(index= False))

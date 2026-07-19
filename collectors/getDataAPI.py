@@ -5,7 +5,7 @@ from vnstock.ui import Market
 mkt = Market()
 repo = Repository()
 
-df = mkt.equity("VIC").ohlcv(interval = "1D", count = 10)
+df = mkt.equity("VIC").ohlcv(interval = "1D", count = 120)
 repo.insert_stock("VIC","VINGROUP","HOSE")
 id = repo.get_stockID("VIC")
 for row in df.itertuples(index = False):
