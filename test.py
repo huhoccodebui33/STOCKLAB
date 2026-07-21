@@ -1,9 +1,12 @@
-from database.repository import Repository
+from database.repository_stock import RepoStock
+from database.resporitory_price import RepoPrice
+from vnstock.ui import Market
 import pandas as pd
 
-repo = Repository()
-pd.set_option("display.max_rows", None)
-pd.set_option("display.max_columns", None)
-pd.set_option("display.width", None)
-df_VIC = repo.get_ohlcv("VIC")
-print(df_VIC.to_string(index= False))
+mkt = Market()
+stock_data = RepoStock()
+stock_price = RepoPrice()
+df  = pd.DataFrame(mkt.equity("VIC").ohlcv(interval = "1D", count = 1000))
+id = stock_data.get_stockID("VIC")
+stock_price.insert_many_price(id,df)
+
