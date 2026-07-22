@@ -25,15 +25,14 @@ class RepoPrice:
             if cur:
                 cur.close()
 
-    def get_price(self,symbol):
+    def get_price_all(self,symbol):
         conn = None
         try:
             conn = getConnection()
             sql ="""SELECT
-                    dp.id,
                     dp.trading_date,
                     dp.open_price,
-                    dp.high,t
+                    dp.high,
                     dp.low,
                     dp.close_price,
                     dp.volume
@@ -43,6 +42,58 @@ class RepoPrice:
                     ORDER BY dp.trading_date
                      """      
             df = pd.read_sql(sql,conn,params=(symbol,)) 
+            return df
+        except Exception as e:
+            print(e)
+            return None
+        finally:
+            if conn:
+                conn.close()
+
+    def get_price_btw(self,symbol,start_date: str, end_date:str): #year-month-date (2999-02-02)
+        conn = None
+        try:
+            conn = getConnection()
+            sql = """SELECT
+                    dp.trading_date,
+                    dp.open_price,
+                    dp.high,
+                    dp.low,
+                    dp.close_price,
+                    dp.volume
+                    FROM daily_prices dp
+                    JOIN stocks s ON dp.stock_id = s.id
+                    WHERE s.symbol = %s
+                        AND dp.trading_date BETWEEN %s AND %s
+                    ORDER BY dp.trading_date
+                     """
+            df = pd.read_sql(sql,conn, params=(symbol,start_date,end_date))
+            return df
+        except Exception as e:
+            print(e)
+            return None
+        finally:
+            if conn:
+                conn.close()
+
+    def get_price_limit(self, symbol, limit):
+        conn = None
+        try:
+            conn = getConnection()
+            sql ="""SELECT
+                    dp.trading_date,
+                    dp.open_price,
+                    dp.high,
+                    dp.low,
+                    dp.close_price,
+                    dp.volume
+                    FROM daily_prices dp
+                    JOIN stocks s ON dp.stock_id = s.id
+                    WHERE s.symbol = %s
+                    ORDER BY dp.trading_date DESC
+                    LIMIT %s
+                     """      
+            df = pd.read_sql(sql,conn,params=(symbol,limit)) 
             return df
         except Exception as e:
             print(e)

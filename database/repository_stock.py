@@ -68,8 +68,10 @@ class RepoStock:
             print(e)
             return None
         finally:
-            cur.close()
-            conn.close()
+            if conn:
+                conn.close()
+            if cur: 
+                cur.close()
 
     def get_all_stock(self):
         conn = None
@@ -89,8 +91,10 @@ class RepoStock:
             print(e)
             return None
         finally:
-            cur.close()
-            conn.close()
+            if conn:
+                conn.close()
+            if cur: 
+                cur.close()
 
     def exist_stock(self,symbol):
         conn = None
@@ -109,8 +113,10 @@ class RepoStock:
         except Exception as e:
             print(e)
         finally:
-            cur.close()
-            conn.close()
+            if conn:
+                conn.close()
+            if cur: 
+                cur.close()
 
     def count_stock(self):
         conn = None
@@ -129,7 +135,9 @@ class RepoStock:
         except Exception as e:
             print(e)
         finally:
-            cur.close()
-            conn.close()
+            if conn:
+                conn.close()
+            if cur: 
+                cur.close()
     
 
