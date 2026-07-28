@@ -28,4 +28,4 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          python -m AI_PM
+          python -m AI_PM.run
