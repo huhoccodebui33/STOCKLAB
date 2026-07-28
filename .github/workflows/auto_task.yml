@@ -2,9 +2,9 @@ name: AI PM Auto Task
 
 on:
   push:
-    branches: [ "main", "master" ] # Tự động chạy mỗi khi mày git push code lên nhánh chính
+    branches: [ "main", "master" ]
   schedule:
-    - cron: '0 1 * * *' # Tự động chạy định kỳ mỗi ngày lúc 8h sáng giờ Việt Nam
+    - cron: '0 1 * * *'
 
 jobs:
   run-ai-pm:
@@ -19,7 +19,6 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        uses: actions/setup-python@v5
         run: |
           pip install requests python-dotenv google-genai
 
