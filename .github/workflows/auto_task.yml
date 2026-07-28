@@ -1,0 +1,32 @@
+name: AI PM Auto Task
+
+on:
+  push:
+    branches: [ "main", "master" ] # Tự động chạy mỗi khi mày git push code lên nhánh chính
+  schedule:
+    - cron: '0 1 * * *' # Tự động chạy định kỳ mỗi ngày lúc 8h sáng giờ Việt Nam
+
+jobs:
+  run-ai-pm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        uses: actions/setup-python@v5
+        run: |
+          pip install requests python-dotenv google-genai
+
+      - name: Run AI Project Manager
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python -m AI_PM
