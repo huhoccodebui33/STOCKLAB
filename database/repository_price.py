@@ -1,4 +1,5 @@
-from database.connection import getConnection
+from database.connection import getConnection, getEngine
+from sqlalchemy import text
 from psycopg2.extras import execute_values
 import pandas as pd
 
@@ -38,10 +39,10 @@ class RepoPrice:
                     dp.volume
                     FROM daily_prices dp
                     JOIN stocks s ON dp.stock_id = s.id
-                    WHERE s.symbol = %s
+                    WHERE s.symbol = :symbol
                     ORDER BY dp.trading_date
                      """      
-            df = pd.read_sql(sql,conn,params=(symbol,)) 
+            df = pd.read_sql(text(sql),getEngine(),params={"symbol":symbol}) 
             return df
         except Exception as e:
             print(e)
@@ -63,11 +64,11 @@ class RepoPrice:
                     dp.volume
                     FROM daily_prices dp
                     JOIN stocks s ON dp.stock_id = s.id
-                    WHERE s.symbol = %s
-                        AND dp.trading_date BETWEEN %s AND %s
+                    WHERE s.symbol = :symbol
+                        AND dp.trading_date BETWEEN :start_date AND :end_date
                     ORDER BY dp.trading_date
                      """
-            df = pd.read_sql(sql,conn, params=(symbol,start_date,end_date))
+            df = pd.read_sql(text(sql),getEngine(), params={"symbol":symbol,"start_date":start_date,"end_date":end_date})
             return df
         except Exception as e:
             print(e)
@@ -89,11 +90,11 @@ class RepoPrice:
                     dp.volume
                     FROM daily_prices dp
                     JOIN stocks s ON dp.stock_id = s.id
-                    WHERE s.symbol = %s
-                    ORDER BY dp.trading_date DESC
-                    LIMIT %s
+                    WHERE s.symbol = :symbol
+                    ORDER BY dp.trading_date ASC
+                    LIMIT :limit
                      """      
-            df = pd.read_sql(sql,conn,params=(symbol,limit)) 
+            df = pd.read_sql(text(sql),getEngine(),params={"symbol":symbol,"limit":limit}) 
             return df
         except Exception as e:
             print(e)
