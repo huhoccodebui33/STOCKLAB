@@ -1,0 +1,6 @@
+numpy==2.2.6
+pandas==2.3.3
+psycopg2-binary==2.9.12
+python-dotenv==1.2.3
+SQLAlchemy==2.0.52
+vnstock==4.0.7
