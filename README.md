@@ -110,6 +110,61 @@ details. Do not place a complete connection URL in source code. Do not commit
 Each contributor should use their own database credential. Do not share a
 database owner password through GitHub, chat, screenshots, or documentation.
 
+### Working with the existing Neon data
+
+Cloning this GitHub repository does not copy PostgreSQL tables or rows. The
+database is separate from the source code.
+
+If the project database already contains stock and price data, choose one of
+these workflows:
+
+#### Recommended: give each contributor a Neon development branch
+
+The project owner creates a Neon branch from the branch that contains the
+current data. The new branch starts with the same schema and rows, but later
+changes are isolated from the original branch.
+
+Suggested workflow:
+
+1. Open the project in the Neon Console.
+2. Create a branch named for the contributor, such as `friend-dev`.
+3. Create or select a compute endpoint for that branch.
+4. Give the contributor a separate database role with only the required
+   privileges.
+5. Send the branch connection details privately, never through GitHub.
+6. The contributor places those details in their own local `.env`.
+
+With a branch that already contains `stocks` and `daily_prices`, the
+contributor should not run `database.migrate` unless the schema has changed.
+They can test the connection and then run `main.py`.
+
+#### Shared database: use a restricted role
+
+Two contributors can connect to the same database, but their inserts and other
+changes will affect the same tables. Never share the database owner password.
+Create a separate application role and grant only the privileges required for
+the project.
+
+For this ETL application, the role normally needs:
+
+- `USAGE` on the `public` schema
+- `SELECT` and `INSERT` on `stocks` and `daily_prices`
+- sequence access for the tables' serial IDs
+
+Keep migration and schema-changing privileges with the owner.
+
+#### Independent database: rebuild the data
+
+The contributor can use their own PostgreSQL database:
+
+```bash
+python -m database.migrate
+python main.py
+```
+
+This creates an independent copy by downloading the market data again. It can
+take time because the pipeline intentionally waits between API requests.
+
 ### 5. Test the connection without changing data
 
 ```bash
