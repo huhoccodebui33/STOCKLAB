@@ -18,12 +18,9 @@ existing `(stock_id, trading_date)` pair is not inserted twice.
 ## Requirements
 
 - Python 3.12
-- PostgreSQL
+- A Neon PostgreSQL project
 - Internet access for `vnstock`
 - Git
-
-Docker is optional. The included `docker-compose.yml` can run PostgreSQL
-locally, while a hosted PostgreSQL service such as Neon can be used instead.
 
 ## Project structure
 
@@ -38,7 +35,6 @@ STOCKLAB/
 │   ├── repository_stock.py
 │   └── schema.sql
 ├── .env.example            # Safe configuration template
-├── docker-compose.yml      # Optional local PostgreSQL
 ├── main.py                 # ETL entry point
 ├── requirements.txt
 └── stock_config.py         # Symbols and extraction settings
@@ -76,7 +72,7 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-### 4. Configure PostgreSQL
+### 4. Configure Neon
 
 Create your private environment file:
 
@@ -90,10 +86,11 @@ On Windows PowerShell:
 Copy-Item .env.example .env
 ```
 
-Open `.env` and enter your own PostgreSQL details:
+In the Neon Console, select the intended project and branch, open its connection
+details, and copy the individual values into `.env`:
 
 ```dotenv
-DB_HOST=your-postgresql-host
+DB_HOST=your-neon-host
 DB_PORT=5432
 DB_NAME=your-database-name
 DB_USER=your-database-user
@@ -103,9 +100,8 @@ PGCHANNELBINDING=require
 PGCONNECT_TIMEOUT=10
 ```
 
-For Neon, copy the host, database, role, and password from the Neon connection
-details. Do not place a complete connection URL in source code. Do not commit
-`.env`.
+The pooled Neon hostname normally contains `-pooler`. Do not place a complete
+connection URL in source code, and do not commit `.env`.
 
 Each contributor should use their own database credential. Do not share a
 database owner password through GitHub, chat, screenshots, or documentation.
@@ -153,9 +149,9 @@ For this ETL application, the role normally needs:
 
 Keep migration and schema-changing privileges with the owner.
 
-#### Independent database: rebuild the data
+#### Independent Neon project: rebuild the data
 
-The contributor can use their own PostgreSQL database:
+The contributor can use their own Neon project or an empty Neon branch:
 
 ```bash
 python -m database.migrate
@@ -206,46 +202,6 @@ The default configuration requests many symbols and waits between requests to
 reduce API rate-limit errors. For a first test, temporarily use only one symbol
 and a smaller limit in your own branch.
 
-## Using local PostgreSQL with Docker
-
-The existing Compose configuration exposes PostgreSQL on local port `5433`.
-Start it with:
-
-```bash
-docker compose up -d postgres
-docker compose ps
-```
-
-Configure `.env` with the same username, password, and database shown in
-`docker-compose.yml`:
-
-```dotenv
-DB_HOST=127.0.0.1
-DB_PORT=5433
-DB_NAME=vnstock
-DB_USER=postgres
-DB_PASSWORD=the-password-from-docker-compose
-PGSSLMODE=disable
-PGCHANNELBINDING=disable
-PGCONNECT_TIMEOUT=10
-```
-
-Then initialize and run the project:
-
-```bash
-python -m database.migrate
-python main.py
-```
-
-To stop PostgreSQL while keeping its data:
-
-```bash
-docker compose stop
-```
-
-Do not run `docker compose down -v` unless you intentionally want to delete the
-local database volume and all of its data.
-
 ## Configuration
 
 `stock_config.py` supports two extraction modes.
@@ -283,8 +239,8 @@ python -m database.migrate
 
 ### Connection timeout or hostname error
 
-Check `DB_HOST`, internet access, and `PGCONNECT_TIMEOUT`. For hosted
-PostgreSQL, make sure TLS settings match the provider.
+Check `DB_HOST`, internet access, and `PGCONNECT_TIMEOUT`. Confirm that the Neon
+project and compute endpoint are available and that TLS remains required.
 
 ### Authentication failed
 
