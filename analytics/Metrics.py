@@ -5,7 +5,7 @@ from database.repository_price import RepoPrice
 rpp = RepoPrice()
 
 class Metrics:
-    def log_return(self,symbols : list[str])-> pd.DataFrame:
+    def log_return_list(self,symbols : list[str])-> pd.DataFrame:
         symbols = list(symbols)
 
         if len(symbols) < 2:
@@ -43,9 +43,27 @@ class Metrics:
 
         return log_R
 
+    def log_return_single(self,symbol: str) -> pd.DataFrame:
+        df = rpp.get_price_all(symbol)
+        prices = (
+                    df[["trading_date","close_price"]]
+                    .dropna()
+                    .sort_values("trading_date")
+                    .set_index("trading_date")[["close_price"]]
+                    .astype(float)
+                    )
+        if len(prices) < 3:
+                    raise ValueError("Not enough shared trading dates")
+        if(prices <=0).any().any():
+                    raise ValueError("Close prices must be positive for log returns")
+        log_R = np.log(prices/prices.shift(1))*100
+        log_R = log_R.rename(columns={"close_price": symbol})
+        return log_R
+        
+        
 
     def corr(self,symbols : list[str]) -> pd.DataFrame:
-        log_R = self.log_return(symbols)
+        log_R = self.log_return_list(symbols)
         return log_R.corr(method ="pearson")
 
 
