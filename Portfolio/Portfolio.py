@@ -23,8 +23,8 @@ class Portfolio:
     def buy(self, symbol:str, quantity: float, trading_date:str):
         if quantity <= 0:
             raise ValueError("quantity must be positive")
-        open_price = rpp.get_price_btw(symbol,start_date=trading_date,end_date=trading_date)["open_price"].iloc[0]
-        cur_cost = open_price*quantity
+        price = float(rpp.get_price_btw(symbol,start_date=trading_date,end_date=trading_date)["close_price"].iloc[0])
+        cur_cost = price*quantity
         if cur_cost > self.balance:
             print("Balance is not enough")
             return None
@@ -39,7 +39,7 @@ class Portfolio:
                     "asset_type": "stock",
                     "side": "BUY",
                     "trading_date": trading_date,
-                    "price": open_price,
+                    "price": price,
                     "cost": cur_cost
                 })
     
@@ -77,11 +77,11 @@ class Portfolio:
 
         # Giá trị cổ phiếu đang hold
         for symbol, quantity in self.total_owned_stocks.items():
-            close_price = rpp.get_price_btw(
+            close_price = float(rpp.get_price_btw(
                 symbol,
                 start_date=trading_date,
                 end_date=trading_date
-            )["close_price"].iloc[0]
+            )["close_price"].iloc[0])
 
             long_value += close_price * quantity
 
@@ -109,7 +109,7 @@ class Portfolio:
             symbol,
             start_date=trading_date,
             end_date=trading_date
-        )["open_price"].iloc[0]
+        )["close_price"].iloc[0]
 
         income = open_price * quantity
 

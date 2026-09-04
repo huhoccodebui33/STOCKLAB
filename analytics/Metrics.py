@@ -5,7 +5,7 @@ from database.repository_price import RepoPrice
 rpp = RepoPrice()
 
 class Metrics:
-    def log_return_list(self,symbols : list[str])-> pd.DataFrame:
+    def log_return_list(self,symbols : list[str], start_date: str, end_date:str)-> pd.DataFrame:
         symbols = list(symbols)
 
         if len(symbols) < 2:
@@ -17,7 +17,7 @@ class Metrics:
         price_col = []
 
         for symbol in symbols:
-            df = rpp.get_price_all(symbol)
+            df = rpp.get_price_btw(symbol=symbol, start_date=start_date,end_date=end_date)
             if df is None or df.empty:
                 raise ValueError(f"No price data found for {symbol}")
             prices = (
@@ -43,8 +43,8 @@ class Metrics:
 
         return log_R
 
-    def log_return_single(self,symbol: str) -> pd.DataFrame:
-        df = rpp.get_price_all(symbol)
+    def log_return_single(self,symbol: str, start_date:str,end_date:str) -> pd.DataFrame:
+        df = rpp.get_price_btw(symbol=symbol, start_date=start_date,end_date=end_date)
         prices = (
                     df[["trading_date","close_price"]]
                     .dropna()
@@ -60,10 +60,39 @@ class Metrics:
         log_R = log_R.rename(columns={"close_price": symbol})
         return log_R
         
+    def total_log_return(self, symbols: list[str], start_date:str, end_date:str):
+        log_return = self.log_return_list(symbols,start_date,end_date).dropna()
+        total_sum =  pd.DataFrame(log_return.sum()).rename(columns={0:"total log return"})
+        return total_sum
+
+    def avg_traded_value(self, symbols: list[str], start_date:str, end_date:str):
+        symbols = list(symbols)
+        liquidity = []
+        if len(symbols) < 2:
+            raise ValueError("Give corr() at least two symbols")
+         
+        if len(symbols) != len(set(symbols)):
+            raise ValueError("Symbols must not contain duplicates")
+         
+        for symbol in symbols:
+            data = (
+                 rpp.get_price_btw(symbol,start_date,end_date)
+                 [["trading_date","close_price","volume"]]
+                 .dropna()
+            )
+            if data is None or data.empty:
+                 raise ValueError(f"no price found for {symbol}")
+            avg_trade = (data["close_price"]*data["volume"]).mean()
+            liquidity.append({"symbol":symbol, "avg_trade" : avg_trade})
+        df = pd.DataFrame(liquidity)
+        return df
+            
+            
+
         
 
-    def corr(self,symbols : list[str]) -> pd.DataFrame:
-        log_R = self.log_return_list(symbols)
+    def corr(self,symbols : list[str],start_date:str,end_date:str) -> pd.DataFrame:
+        log_R = self.log_return_list(symbols,start_date,end_date)
         return log_R.corr(method ="pearson")
 
 
